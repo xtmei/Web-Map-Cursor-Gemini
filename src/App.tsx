@@ -68,6 +68,8 @@ export function App() {
     setHasSave(!!localStorage.getItem(SAVE_KEY));
   }, []);
 
+  const [pendingAdvancePhase, setPendingAdvancePhase] = useState(false);
+
   const startNewGame = useCallback((faction: Faction) => {
     const scenario = scenarioData as Scenario;
     const terrainTypes = terrainData.terrainTypes as Record<TerrainId, TerrainType>;
@@ -79,9 +81,16 @@ export function App() {
     const initial = createInitialState(scenario, terrainTypes, hexes, axisUnits, sovietUnits, events, faction);
     dispatch({ type: 'LOAD_STATE', state: initial });
     setGamePhase('game');
-
-    setTimeout(() => dispatch({ type: 'ADVANCE_PHASE' }), 100);
+    setPendingAdvancePhase(true);
   }, []);
+
+  // Advance phase after new game state is loaded — replaces the fragile setTimeout hack
+  useEffect(() => {
+    if (pendingAdvancePhase && gameState) {
+      setPendingAdvancePhase(false);
+      dispatch({ type: 'ADVANCE_PHASE' });
+    }
+  }, [pendingAdvancePhase, gameState]);
 
   const handleLoadGame = useCallback(() => {
     const saved = loadGame();
@@ -108,7 +117,7 @@ export function App() {
     return (
       <>
         <SVGFilters />
-        <RetroOverlay enabled={true} strength={75} />
+        <RetroOverlay enabled={true} strength={85} />
         <TitleScreen
           onStart={() => setGamePhase('setup')}
           onLoad={hasSave ? handleLoadGame : undefined}
@@ -121,7 +130,7 @@ export function App() {
     return (
       <>
         <SVGFilters />
-        <RetroOverlay enabled={true} strength={75} />
+        <RetroOverlay enabled={true} strength={85} />
         <FactionSelect onSelect={startNewGame} />
       </>
     );

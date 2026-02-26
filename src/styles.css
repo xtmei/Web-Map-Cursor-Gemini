@@ -811,6 +811,321 @@ html, body, #root {
 
 /* ===== RETRO OVERLAYS ===== */
 
-.retro-paper, .retro-noise, .retro-folds, .retro-vignette {
+.retro-paper, .retro-noise, .retro-folds, .retro-vignette, .retro-border {
   pointer-events: none;
 }
+
+/* ===== TITLE CARD MILITARY STYLE ===== */
+
+.title-card-military {
+  position: relative;
+  padding: 28px 24px 24px;
+  overflow: visible;
+}
+
+/* Four-corner decorative brackets */
+.title-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--accent);
+  border-style: solid;
+}
+.title-corner-tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+.title-corner-tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+.title-corner-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+.title-corner-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+.title-top-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 4px 0;
+}
+
+.title-stars {
+  font-size: 13px;
+  letter-spacing: 8px;
+  color: var(--gold);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.title-heading {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: 12px;
+  color: var(--ink);
+  text-transform: uppercase;
+  margin: 6px 0 0;
+}
+
+.title-date-stamp {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  border: 1px solid var(--ink-light);
+  display: inline-block;
+  padding: 2px 8px;
+  margin-top: 4px;
+  opacity: 0.75;
+}
+
+.title-map-preview {
+  margin: 12px auto 8px;
+  display: flex;
+  justify-content: center;
+  border: 1px solid rgba(139,94,43,0.25);
+  background: rgba(200,184,112,0.12);
+  padding: 6px;
+  max-width: 130px;
+  border-radius: 2px;
+}
+
+.btn-campaign {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 3px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* ===== VICTORY SCREEN ===== */
+
+.victory-card {
+  border-width: 3px;
+}
+
+.victory-axis {
+  border-color: var(--axis-color);
+  box-shadow: 0 4px 24px rgba(58, 90, 122, 0.25);
+}
+
+.victory-soviet {
+  border-color: var(--soviet-color);
+  box-shadow: 0 4px 24px rgba(150, 40, 40, 0.25);
+}
+
+.victory-draw {
+  border-color: var(--accent);
+}
+
+.victory-badge {
+  margin: 0 auto 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.victory-heading {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 34px;
+  letter-spacing: 8px;
+  margin: 0 0 4px;
+}
+
+.victory-winner {
+  font-size: 16px;
+  font-style: italic;
+  margin: 4px 0 8px;
+}
+
+.victory-winner.axis { color: var(--axis-color); }
+.victory-winner.soviet { color: var(--soviet-color); }
+
+/* VP comparison bar */
+.victory-vp-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.vp-bar-label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 36px;
+}
+
+.vp-bar-label.vp-bar-axis { color: var(--axis-color); text-align: right; }
+.vp-bar-label.vp-bar-soviet { color: var(--soviet-color); text-align: left; }
+
+.vp-bar-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.15);
+  display: flex;
+}
+
+.vp-bar-axis-fill {
+  background: var(--axis-color);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.vp-bar-soviet-fill {
+  background: var(--soviet-color);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.vp-faction-axis { color: var(--axis-color); font-weight: bold; }
+.vp-faction-soviet { color: var(--soviet-color); font-weight: bold; }
+
+/* ===== EVENT BANNER ENHANCED ===== */
+
+.event-banner {
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #c8b060, #d4bc70);
+  border-bottom: 1px solid #9a7820;
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  z-index: 100;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.event-banner-collapsed {
+  padding: 5px 12px;
+  gap: 8px;
+  align-items: center;
+  display: flex;
+}
+
+.event-accent-bar {
+  width: 4px;
+  background: #9a7820;
+  flex-shrink: 0;
+}
+
+.event-content {
+  padding: 6px 10px;
+  flex: 1;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.event-type-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.event-title, .event-title-mini {
+  font-family: Georgia, serif;
+  font-weight: bold;
+  font-size: 15px;
+  color: #3a2a0a;
+}
+
+.event-expand-hint {
+  margin-left: auto;
+  font-size: 11px;
+  color: #6a5010;
+}
+
+.event-collapse {
+  margin-left: auto;
+  color: #6a5010;
+  font-size: 11px;
+}
+
+.event-flavor {
+  font-style: italic;
+  font-size: 12px;
+  color: #5a4010;
+  margin: 3px 0 2px;
+  border-left: 2px solid #9a7820;
+  padding-left: 6px;
+}
+
+.event-rule {
+  font-size: 12px;
+  color: #3a2a0a;
+  font-weight: 500;
+}
+
+/* ===== TOP BAR RESOURCE DOTS ===== */
+
+.top-bar-row-resources {
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.top-resource {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.top-vp {
+  flex: 1;
+  min-width: 100px;
+}
+
+.dot-icons {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.dot-icon {
+  font-size: 8px;
+  line-height: 1;
+}
+
+.dot-cp { color: var(--accent); }
+.dot-art { color: #8a6030; }
+.dot-empty { color: var(--ink-light); opacity: 0.4; }
+
+.dot-overflow {
+  font-size: 8px;
+  color: var(--ink-light);
+  font-family: 'Courier New', monospace;
+}
+
+.phase-badge {
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.phase-action { color: var(--accent); font-weight: bold; }
+.phase-upkeep { color: var(--ink-light); }
+.phase-event { color: #806020; }
+.phase-end { color: #a03020; }
+
+/* VP mini bar in top bar */
+.vp-bar-mini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.vp-bar-track-mini {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.18);
+  display: flex;
+  min-width: 50px;
+}
+
+.vp-bar-num {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 14px;
+  text-align: center;
+}
+

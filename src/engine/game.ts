@@ -344,7 +344,7 @@ export function createInitialState(
     attacksMadeThisTurn: 0,
     settings: {
       retroEffects: true,
-      effectsStrength: 75,
+      effectsStrength: 85,
       showSupplyOverlay: false,
     },
     winner: null,
@@ -395,11 +395,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (s.turn > s.scenario.maxTurn) {
         s.phase = 'victory';
         const axisThreshold = s.scenario.victoryConditions.axis.vpThreshold || 10;
+        const sovietSurvivalVP = s.scenario.victoryConditions.soviet.vpThreshold || 5;
         if (s.vp.axis >= axisThreshold) {
+          // Axis reaches VP threshold → Axis wins
           s.winner = 'axis';
-        } else if (s.vp.soviet >= 5) {
+        } else if (s.vp.soviet >= sovietSurvivalVP) {
+          // Soviet survived to final turn holding enough VP → Soviet wins
           s.winner = 'soviet';
         } else {
+          // Neither threshold met — closest to axis threshold wins, or draw
           s.winner = s.vp.axis > s.vp.soviet ? 'axis' : s.vp.soviet > s.vp.axis ? 'soviet' : 'draw';
         }
         s.log = [...s.log, addLog(s, `Game over! Winner: ${s.winner}`)];
