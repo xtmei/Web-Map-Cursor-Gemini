@@ -1,0 +1,42 @@
+{
+  "id": "stalingrad_mvp_plus",
+  "name": "Stalingrad: Autumn Storm",
+  "description": "September 1942. The German 6th Army drives into the shattered city of Stalingrad. The Soviet 62nd Army clings to the Volga bank. Every factory, every ruin becomes a fortress. Command is fragile, supply lines stretch thin, and the fog of urban war blinds both sides.",
+  "mapCols": 10,
+  "mapRows": 8,
+  "maxTurn": 8,
+  "turnHours": 6,
+  "startDate": "1942-09-13",
+  "factions": ["axis", "soviet"],
+  "factionNames": { "axis": "6th Army (Axis)", "soviet": "62nd Army (Soviet)" },
+  "firstFaction": "axis",
+  "cpPerTurn": { "axis": 6, "soviet": 5 },
+  "artilleryPerTurn": { "axis": 2, "soviet": 1 },
+  "supplySources": {
+    "axis": [
+      { "col": 0, "row": 0 },
+      { "col": 0, "row": 3 },
+      { "col": 0, "row": 7 }
+    ],
+    "soviet": [
+      { "col": 8, "row": 1 },
+      { "col": 7, "row": 4 },
+      { "col": 8, "row": 6 }
+    ]
+  },
+  "vpHexes": [
+    { "col": 6, "row": 0, "vp": 2, "name": "Tractor Factory" },
+    { "col": 7, "row": 0, "vp": 1, "name": "Tractor Factory East" },
+    { "col": 6, "row": 1, "vp": 2, "name": "Barrikady Factory" },
+    { "col": 5, "row": 2, "vp": 2, "name": "Mamayev Kurgan" },
+    { "col": 5, "row": 5, "vp": 2, "name": "Red October Factory" },
+    { "col": 5, "row": 6, "vp": 2, "name": "Lazur Chemical" },
+    { "col": 8, "row": 1, "vp": 1, "name": "North Ferry" },
+    { "col": 7, "row": 4, "vp": 1, "name": "Central Ferry" },
+    { "col": 8, "row": 6, "vp": 1, "name": "South Ferry" }
+  ],
+  "victoryConditions": {
+    "axis": { "vpThreshold": 10, "description": "Control VP hexes totaling 10+ points" },
+    "soviet": { "survivalTurns": 8, "description": "Hold at least 5 VP worth of hexes until turn 8" }
+  }
+}

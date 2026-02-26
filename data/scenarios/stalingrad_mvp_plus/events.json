@@ -1,0 +1,100 @@
+[
+  {
+    "id": "evt_factory_fire",
+    "title": "Factory Fire",
+    "flavor": "Burning fuel stores send black smoke across the district.",
+    "ruleText": "All industrial hexes cost +1 MP to enter this turn.",
+    "effect": { "type": "terrainCostMod", "terrain": "industrial", "mpDelta": 1 }
+  },
+  {
+    "id": "evt_comm_delay",
+    "title": "Communication Delay",
+    "flavor": "Field telephone lines severed by shellfire.",
+    "ruleText": "Active faction loses 1 CP this turn.",
+    "effect": { "type": "cpMod", "target": "active", "delta": -1 }
+  },
+  {
+    "id": "evt_commando_raid",
+    "title": "Commando Raid",
+    "flavor": "A bold reconnaissance-in-force probes deep behind the lines.",
+    "ruleText": "All friendly recon units gain +1 vision range this turn.",
+    "effect": { "type": "visionMod", "unitFilter": "recon", "target": "active", "delta": 1 }
+  },
+  {
+    "id": "evt_ammo_shortage",
+    "title": "Ammunition Shortage",
+    "flavor": "Supply trucks hit on the approach roads.",
+    "ruleText": "Active faction loses 1 artillery point this turn.",
+    "effect": { "type": "artilleryMod", "target": "active", "delta": -1 }
+  },
+  {
+    "id": "evt_fog",
+    "title": "Morning Fog",
+    "flavor": "Dense Volga fog blankets the riverbank at dawn.",
+    "ruleText": "All units' vision range reduced by 1 this turn (minimum 1).",
+    "effect": { "type": "visionMod", "unitFilter": "all", "target": "both", "delta": -1 }
+  },
+  {
+    "id": "evt_air_support",
+    "title": "Air Support",
+    "flavor": "Stukas / Il-2s sweep overhead.",
+    "ruleText": "Active faction's next attack this turn gets +2 combat bonus.",
+    "effect": { "type": "combatMod", "target": "active", "attackBonus": 2, "uses": 1 }
+  },
+  {
+    "id": "evt_supply_convoy",
+    "title": "Supply Convoy",
+    "flavor": "Fresh supplies reach the front under cover of darkness.",
+    "ruleText": "Active faction gains +2 CP this turn.",
+    "effect": { "type": "cpMod", "target": "active", "delta": 2 }
+  },
+  {
+    "id": "evt_sniper_team",
+    "title": "Sniper Team",
+    "flavor": "A crack marksman disrupts enemy command.",
+    "ruleText": "Choose one visible enemy unit: it becomes Disrupted.",
+    "effect": { "type": "disruptUnit", "target": "enemy", "count": 1 }
+  },
+  {
+    "id": "evt_political_pressure",
+    "title": "Political Pressure",
+    "flavor": "High command demands immediate results.",
+    "ruleText": "Active faction must attack this turn or lose 1 VP.",
+    "effect": { "type": "mustAttack", "target": "active", "vpPenalty": 1 }
+  },
+  {
+    "id": "evt_counter_battery",
+    "title": "Counter-Battery Fire",
+    "flavor": "Enemy gun positions located and silenced.",
+    "ruleText": "Opposing faction loses 1 artillery point.",
+    "effect": { "type": "artilleryMod", "target": "enemy", "delta": -1 }
+  },
+  {
+    "id": "evt_morale_boost",
+    "title": "Morale Boost",
+    "flavor": "Inspiring leadership rallies the troops.",
+    "ruleText": "One disrupted friendly unit recovers.",
+    "effect": { "type": "recoverUnit", "target": "active", "count": 1 }
+  },
+  {
+    "id": "evt_engineers",
+    "title": "Engineers Forward",
+    "flavor": "Pioneer squads clear rubble and lay paths.",
+    "ruleText": "City hex movement cost reduced by 1 (min 1) for active faction this turn.",
+    "effect": { "type": "terrainCostMod", "terrain": "city", "mpDelta": -1, "target": "active" }
+  },
+  {
+    "id": "evt_night_assault",
+    "title": "Night Assault",
+    "flavor": "Under cover of darkness, units slip past the enemy.",
+    "ruleText": "Active faction's units ignore ZOC for movement this turn.",
+    "effect": { "type": "ignoreZOC", "target": "active" }
+  },
+  {
+    "id": "evt_reinforcement",
+    "title": "Reserves Arrive",
+    "flavor": "A fresh detachment is committed to the battle.",
+    "ruleText": "Active faction's weakest unit recovers 2 strength (up to max).",
+    "effect": { "type": "reinforce", "target": "active", "strengthDelta": 2 }
+  }
+]
