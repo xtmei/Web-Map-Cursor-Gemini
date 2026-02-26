@@ -212,13 +212,15 @@ export function HexMap({ state, dispatch }: Props) {
           }
 
           const patternId: Record<string, string> = {
+            open: 'url(#openPattern)',
             city: 'url(#cityPattern)',
             industrial: 'url(#industrialPattern)',
             hill: 'url(#hillPattern)',
             river: 'url(#riverPattern)',
             road: 'url(#roadPattern)',
           };
-          const hasPattern = patternId[hex.terrain] && state.settings.retroEffects;
+          const hasPattern = !!patternId[hex.terrain];
+          const isVisible = visibleHexes.has(key);
 
           return (
             <g key={key} onClick={() => handleHexClick(hex.col, hex.row)} style={{ cursor: 'pointer' }}>
@@ -249,6 +251,14 @@ export function HexMap({ state, dispatch }: Props) {
                   points={corners}
                   fill="#d94040"
                   opacity={0.25}
+                  style={{ pointerEvents: 'none' }}
+                />
+              )}
+              {/* Fog of war overlay — darken hexes not in player's vision */}
+              {!isVisible && !tt.impassable && (
+                <polygon
+                  points={corners}
+                  fill="rgba(18,12,6,0.38)"
                   style={{ pointerEvents: 'none' }}
                 />
               )}
