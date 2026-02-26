@@ -1,8 +1,8 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { GameState, GameAction, Faction, Unit, HexCoord, TerrainId } from '../types';
+import { GameState, GameAction, Unit } from '../types';
 import {
   hexToPixel, hexCorners, HEX_SIZE, hexKey, findReachable, hexDistance,
-  getVisibleHexes, computeSupply,
+  computeSupply,
 } from '../engine/hex';
 import {
   getAllVisibleHexes, getEnemyZOC, getBlockedHexes, getMoveCostMods, hasIgnoreZOC, getVisionMod,
@@ -14,10 +14,14 @@ interface Props {
   dispatch: React.Dispatch<GameAction>;
 }
 
+const DRAG_THRESHOLD = 8;
+
 export function HexMap({ state, dispatch }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewBox, setViewBox] = useState({ x: -40, y: -40, w: 500, h: 500 });
   const [dragging, setDragging] = useState(false);
+  const [hasDragged, setHasDragged] = useState(false);
+  const [dragOrigin, setDragOrigin] = useState({ x: 0, y: 0 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [pinchDist, setPinchDist] = useState(0);
 
@@ -32,7 +36,7 @@ export function HexMap({ state, dispatch }: Props) {
 
   const visibleHexes = useMemo(() => {
     return getAllVisibleHexes(units, activeFaction, scenario.mapCols, scenario.mapRows, getVisionMod(state));
-  }, [units, activeFaction, scenario, state]);
+  }, [units, activeFaction, scenario.mapCols, scenario.mapRows, state.activeEffects]);
 
   const reachableHexes = useMemo(() => {
     if (actionMode !== 'move' || !selectedUnitId) return null;
@@ -52,7 +56,7 @@ export function HexMap({ state, dispatch }: Props) {
       scenario.mapRows,
       getMoveCostMods(state)
     );
-  }, [actionMode, selectedUnitId, units, activeFaction, hexes, terrainTypes, scenario, state]);
+  }, [actionMode, selectedUnitId, units, activeFaction, hexes, terrainTypes, scenario.mapCols, scenario.mapRows, state.activeEffects]);
 
   const attackableHexes = useMemo(() => {
     if (actionMode !== 'attack' || !selectedUnitId) return new Set<string>();
@@ -76,28 +80,36 @@ export function HexMap({ state, dispatch }: Props) {
       activeFaction, sources, hexes, terrainTypes,
       state.hexControl, scenario.mapCols, scenario.mapRows
     );
-  }, [state.settings.showSupplyOverlay, activeFaction, hexes, terrainTypes, state.hexControl, scenario]);
+  }, [state.settings.showSupplyOverlay, activeFaction, hexes, terrainTypes, state.hexControl, scenario.mapCols, scenario.mapRows]);
 
   const handleHexClick = useCallback((col: number, row: number) => {
+    if (hasDragged) return;
     dispatch({ type: 'SELECT_HEX', col, row });
-  }, [dispatch]);
+  }, [dispatch, hasDragged]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (e.pointerType === 'touch' || e.button === 0) {
       setDragging(true);
+      setHasDragged(false);
+      setDragOrigin({ x: e.clientX, y: e.clientY });
       setDragStart({ x: e.clientX, y: e.clientY });
     }
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!dragging) return;
+    const totalDx = e.clientX - dragOrigin.x;
+    const totalDy = e.clientY - dragOrigin.y;
+    if (Math.abs(totalDx) > DRAG_THRESHOLD || Math.abs(totalDy) > DRAG_THRESHOLD) {
+      setHasDragged(true);
+    }
     const dx = e.clientX - dragStart.x;
     const dy = e.clientY - dragStart.y;
-    if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return;
     const scale = viewBox.w / (svgRef.current?.clientWidth || 500);
     setViewBox((v) => ({ ...v, x: v.x - dx * scale, y: v.y - dy * scale }));
     setDragStart({ x: e.clientX, y: e.clientY });
-  }, [dragging, dragStart, viewBox.w]);
+  }, [dragging, dragStart, dragOrigin, viewBox.w]);
 
   const handlePointerUp = useCallback(() => {
     setDragging(false);
@@ -107,8 +119,8 @@ export function HexMap({ state, dispatch }: Props) {
     e.preventDefault();
     const factor = e.deltaY > 0 ? 1.1 : 0.9;
     setViewBox((v) => {
-      const nw = v.w * factor;
-      const nh = v.h * factor;
+      const nw = Math.max(150, Math.min(2000, v.w * factor));
+      const nh = Math.max(150, Math.min(2000, v.h * factor));
       return {
         x: v.x + (v.w - nw) / 2,
         y: v.y + (v.h - nh) / 2,
@@ -134,13 +146,13 @@ export function HexMap({ state, dispatch }: Props) {
       const factor = pinchDist / newDist;
       setPinchDist(newDist);
       setViewBox((v) => {
-        const nw = v.w * factor;
-        const nh = v.h * factor;
+        const nw = Math.max(150, Math.min(2000, v.w * factor));
+        const nh = Math.max(150, Math.min(2000, v.h * factor));
         return {
           x: v.x + (v.w - nw) / 2,
           y: v.y + (v.h - nh) / 2,
-          w: Math.max(200, Math.min(2000, nw)),
-          h: Math.max(200, Math.min(2000, nh)),
+          w: nw,
+          h: nh,
         };
       });
     }
@@ -264,7 +276,7 @@ export function HexMap({ state, dispatch }: Props) {
           );
         })}
 
-        {Array.from(unitsByHex.entries()).map(([key, unitsOnHex]) => {
+        {Array.from(unitsByHex.entries()).map(([, unitsOnHex]) => {
           const { col, row } = unitsOnHex[0];
           const { x, y } = hexToPixel(col, row);
           return unitsOnHex.map((unit, idx) => {
@@ -274,8 +286,8 @@ export function HexMap({ state, dispatch }: Props) {
 
             if (isEnemy && !isVisible) return null;
 
-            const offsetX = unitsOnHex.length > 1 ? (idx - (unitsOnHex.length - 1) / 2) * 8 : 0;
-            const offsetY = unitsOnHex.length > 1 ? (idx % 2) * 4 : 0;
+            const offsetX = unitsOnHex.length > 1 ? (idx - (unitsOnHex.length - 1) / 2) * 10 : 0;
+            const offsetY = unitsOnHex.length > 1 ? (idx % 2) * 5 - 2 : 0;
 
             return (
               <Counter

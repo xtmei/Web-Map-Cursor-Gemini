@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useState, useCallback, useRef } from 'react';
+import React, { useReducer, useEffect, useState, useCallback } from 'react';
 import {
   GameState, GameAction, Faction, Unit, UnitData, HexData, TerrainId, TerrainType,
   Scenario, EventCard, GamePhase,
@@ -80,10 +80,7 @@ export function App() {
     dispatch({ type: 'LOAD_STATE', state: initial });
     setGamePhase('game');
 
-    setTimeout(() => {
-      dispatch({ type: 'ADVANCE_PHASE' });
-      setTimeout(() => dispatch({ type: 'ADVANCE_PHASE' }), 300);
-    }, 100);
+    setTimeout(() => dispatch({ type: 'ADVANCE_PHASE' }), 100);
   }, []);
 
   const handleLoadGame = useCallback(() => {
@@ -147,7 +144,6 @@ export function App() {
           onReady={() => {
             dispatch({ type: 'ACKNOWLEDGE_PASS' });
             dispatch({ type: 'ADVANCE_PHASE' });
-            setTimeout(() => dispatch({ type: 'ADVANCE_PHASE' }), 300);
           }}
         />
       </>

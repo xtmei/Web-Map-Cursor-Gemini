@@ -8,30 +8,35 @@ interface Props {
   onSave: () => void;
 }
 
-interface ActionButton {
-  label: string;
-  icon: string;
-  mode?: ActionMode;
-  action?: () => void;
-  disabled: boolean;
-  active: boolean;
-  cost?: string;
-}
-
 export function ActionBar({ state, dispatch, selectedUnit, onSave }: Props) {
   const { activeFaction, actionMode, turnPhase, cp } = state;
   const isActionPhase = turnPhase === 'action';
   const hasCP = cp[activeFaction] >= 1;
   const hasArt = state.artilleryPoints[activeFaction] >= 1;
 
-  if (turnPhase === 'upkeep' || turnPhase === 'event') {
+  if (turnPhase === 'upkeep') {
     return (
       <div className="action-bar">
         <button
           className="btn btn-action btn-primary"
           onClick={() => dispatch({ type: 'ADVANCE_PHASE' })}
+          style={{ width: '100%' }}
         >
-          {turnPhase === 'upkeep' ? 'Begin Turn' : 'Continue'}
+          Begin Turn &mdash; {state.scenario.factionNames[activeFaction]}
+        </button>
+      </div>
+    );
+  }
+
+  if (turnPhase === 'event') {
+    return (
+      <div className="action-bar">
+        <button
+          className="btn btn-action btn-primary"
+          onClick={() => dispatch({ type: 'ADVANCE_PHASE' })}
+          style={{ width: '100%' }}
+        >
+          Continue to Action Phase
         </button>
       </div>
     );
@@ -43,6 +48,7 @@ export function ActionBar({ state, dispatch, selectedUnit, onSave }: Props) {
         <button
           className="btn btn-action btn-primary"
           onClick={() => dispatch({ type: 'END_TURN' })}
+          style={{ width: '100%' }}
         >
           End Turn
         </button>
@@ -50,97 +56,96 @@ export function ActionBar({ state, dispatch, selectedUnit, onSave }: Props) {
     );
   }
 
-  const buttons: ActionButton[] = [
-    {
-      label: 'Move',
-      icon: '\u2192',
-      mode: 'move',
-      disabled: !selectedUnit || !isActionPhase || !hasCP || selectedUnit.faction !== activeFaction,
-      active: actionMode === 'move',
-      cost: '1 CP',
-    },
-    {
-      label: 'Attack',
-      icon: '\u2694',
-      mode: 'attack',
-      disabled: !selectedUnit || !isActionPhase || !hasCP || selectedUnit.faction !== activeFaction,
-      active: actionMode === 'attack',
-      cost: '1 CP',
-    },
-    {
-      label: 'Recon',
-      icon: '\u2609',
-      mode: 'recon',
-      disabled: !selectedUnit || !isActionPhase || !hasCP || !selectedUnit.isRecon || selectedUnit.faction !== activeFaction,
-      active: actionMode === 'recon',
-      cost: '1 CP',
-    },
-    {
-      label: 'Artillery',
-      icon: '\u2738',
-      mode: 'artillery',
-      disabled: !isActionPhase || !hasCP || !hasArt,
-      active: actionMode === 'artillery',
-      cost: '1 CP + 1 Art',
-    },
-    {
-      label: 'Rest',
-      icon: '\u2665',
-      mode: 'rest',
-      disabled: !selectedUnit || !isActionPhase || !hasCP || selectedUnit.faction !== activeFaction,
-      active: actionMode === 'rest',
-      cost: '1 CP',
-    },
-  ];
+  const canMove = !!selectedUnit && isActionPhase && hasCP && selectedUnit.faction === activeFaction && selectedUnit.mpRemaining > 0;
+  const canAttack = !!selectedUnit && isActionPhase && hasCP && selectedUnit.faction === activeFaction && selectedUnit.attack > 0;
+  const canRecon = !!selectedUnit && isActionPhase && hasCP && selectedUnit.isRecon && selectedUnit.faction === activeFaction;
+  const canRest = !!selectedUnit && isActionPhase && hasCP && selectedUnit.faction === activeFaction &&
+    (selectedUnit.disrupted || selectedUnit.strength < selectedUnit.maxStrength);
 
   return (
     <div className="action-bar">
       <div className="action-buttons-scroll">
-        {buttons.map((btn) => (
-          <button
-            key={btn.label}
-            className={`btn btn-action ${btn.active ? 'active' : ''} ${btn.disabled ? 'disabled' : ''}`}
-            disabled={btn.disabled}
-            onClick={() => {
-              if (btn.mode === 'rest' && selectedUnit) {
-                dispatch({ type: 'EXECUTE_REST' });
-              } else if (btn.mode === 'recon' && selectedUnit) {
-                dispatch({ type: 'EXECUTE_RECON' });
-              } else if (btn.mode) {
-                dispatch({ type: 'SET_ACTION_MODE', mode: actionMode === btn.mode ? 'select' : btn.mode });
-              }
-            }}
-          >
-            <span className="action-icon">{btn.icon}</span>
-            <span className="action-label">{btn.label}</span>
-            {btn.cost && <span className="action-cost">{btn.cost}</span>}
-          </button>
-        ))}
+        <button
+          className={`btn btn-action ${actionMode === 'move' ? 'active' : ''} ${!canMove ? 'disabled' : ''}`}
+          disabled={!canMove}
+          onClick={() => dispatch({ type: 'SET_ACTION_MODE', mode: actionMode === 'move' ? 'select' : 'move' })}
+        >
+          <span className="action-icon">{'\u2192'}</span>
+          <span className="action-label">Move</span>
+          <span className="action-cost">1 CP</span>
+        </button>
+
+        <button
+          className={`btn btn-action ${actionMode === 'attack' ? 'active' : ''} ${!canAttack ? 'disabled' : ''}`}
+          disabled={!canAttack}
+          onClick={() => dispatch({ type: 'SET_ACTION_MODE', mode: actionMode === 'attack' ? 'select' : 'attack' })}
+        >
+          <span className="action-icon">{'\u2694'}</span>
+          <span className="action-label">Attack</span>
+          <span className="action-cost">1 CP</span>
+        </button>
+
+        <button
+          className={`btn btn-action ${!canRecon ? 'disabled' : ''}`}
+          disabled={!canRecon}
+          onClick={() => {
+            if (canRecon) dispatch({ type: 'EXECUTE_RECON' });
+          }}
+        >
+          <span className="action-icon">{'\u2609'}</span>
+          <span className="action-label">Recon</span>
+          <span className="action-cost">1 CP</span>
+        </button>
+
+        <button
+          className={`btn btn-action ${actionMode === 'artillery' ? 'active' : ''} ${!(isActionPhase && hasCP && hasArt) ? 'disabled' : ''}`}
+          disabled={!(isActionPhase && hasCP && hasArt)}
+          onClick={() => dispatch({ type: 'SET_ACTION_MODE', mode: actionMode === 'artillery' ? 'select' : 'artillery' })}
+        >
+          <span className="action-icon">{'\u2738'}</span>
+          <span className="action-label">Artillery</span>
+          <span className="action-cost">1CP+1Art</span>
+        </button>
+
+        <button
+          className={`btn btn-action ${!canRest ? 'disabled' : ''}`}
+          disabled={!canRest}
+          onClick={() => {
+            if (canRest) dispatch({ type: 'EXECUTE_REST' });
+          }}
+        >
+          <span className="action-icon">{'\u2665'}</span>
+          <span className="action-label">Rest</span>
+          <span className="action-cost">1 CP</span>
+        </button>
+
         <button
           className="btn btn-action btn-end"
           onClick={() => dispatch({ type: 'ADVANCE_PHASE' })}
           disabled={!isActionPhase}
         >
-          <span className="action-icon">&#9632;</span>
-          <span className="action-label">End Phase</span>
+          <span className="action-icon">{'\u25A0'}</span>
+          <span className="action-label">End</span>
         </button>
-        <button
-          className="btn btn-action btn-save"
-          onClick={onSave}
-        >
-          <span className="action-icon">&#9998;</span>
+
+        <button className="btn btn-action btn-save" onClick={onSave}>
+          <span className="action-icon">{'\u2193'}</span>
           <span className="action-label">Save</span>
         </button>
-        {selectedUnit && (
+
+        {(selectedUnit || actionMode !== 'select') && (
           <button
             className="btn btn-action"
             onClick={() => dispatch({ type: 'DESELECT' })}
           >
-            <span className="action-icon">&#10005;</span>
-            <span className="action-label">Deselect</span>
+            <span className="action-icon">{'\u2715'}</span>
+            <span className="action-label">Cancel</span>
           </button>
         )}
       </div>
+      {!hasCP && isActionPhase && (
+        <div className="action-no-cp">No CP remaining — End Phase to continue</div>
+      )}
     </div>
   );
 }
