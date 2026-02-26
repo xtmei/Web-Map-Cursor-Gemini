@@ -211,6 +211,15 @@ export function HexMap({ state, dispatch }: Props) {
             fill = isSupplied ? tt.color : `${tt.color}88`;
           }
 
+          const patternId: Record<string, string> = {
+            city: 'url(#cityPattern)',
+            industrial: 'url(#industrialPattern)',
+            hill: 'url(#hillPattern)',
+            river: 'url(#riverPattern)',
+            road: 'url(#roadPattern)',
+          };
+          const hasPattern = patternId[hex.terrain] && state.settings.retroEffects;
+
           return (
             <g key={key} onClick={() => handleHexClick(hex.col, hex.row)} style={{ cursor: 'pointer' }}>
               <polygon
@@ -220,6 +229,13 @@ export function HexMap({ state, dispatch }: Props) {
                 strokeWidth={isSelected ? 2.5 : isReachable || isAttackable ? 2 : 0.8}
                 opacity={tt.impassable ? 0.7 : 1}
               />
+              {hasPattern && (
+                <polygon
+                  points={corners}
+                  fill={patternId[hex.terrain]}
+                  style={{ pointerEvents: 'none' }}
+                />
+              )}
               {isReachable && (
                 <polygon
                   points={corners}
@@ -239,7 +255,7 @@ export function HexMap({ state, dispatch }: Props) {
               {isVP && (
                 <text
                   x={x}
-                  y={y - HEX_SIZE * 0.65}
+                  y={y - HEX_SIZE * 0.7}
                   textAnchor="middle"
                   fontSize={7}
                   fill="#c8a020"
@@ -252,21 +268,35 @@ export function HexMap({ state, dispatch }: Props) {
               {control && (
                 <circle
                   cx={x + HEX_SIZE * 0.6}
-                  cy={y - HEX_SIZE * 0.55}
+                  cy={y - HEX_SIZE * 0.6}
                   r={3}
                   fill={control === 'axis' ? '#5a6a7a' : '#b83030'}
-                  opacity={0.6}
+                  opacity={0.5}
                   style={{ pointerEvents: 'none' }}
                 />
               )}
+              <text
+                x={x}
+                y={y + HEX_SIZE * 0.88}
+                textAnchor="middle"
+                fontSize={4}
+                fill="#6a5a4a"
+                fontFamily="'Courier New', monospace"
+                opacity={0.4}
+                style={{ pointerEvents: 'none' }}
+              >
+                {hex.col},{hex.row}
+              </text>
               {hex.name && (
                 <text
                   x={x}
-                  y={y + HEX_SIZE * 0.85}
+                  y={y + HEX_SIZE * 0.6}
                   textAnchor="middle"
-                  fontSize={5.5}
-                  fill="#4a3a2a"
+                  fontSize={4.5}
+                  fill="#3a2a1a"
                   fontFamily="Georgia, serif"
+                  fontWeight="bold"
+                  opacity={0.7}
                   style={{ pointerEvents: 'none' }}
                 >
                   {hex.name}
